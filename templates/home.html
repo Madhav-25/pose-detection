@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pose Estimation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        h2 {
+            margin-top: 20px;
+        }
+
+        .upload-section {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .upload-section label {
+            font-weight: bold;
+        }
+
+        .upload-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .upload-form input[type="file"] {
+            margin-top: 10px;
+        }
+
+        .upload-form input[type="submit"] {
+            margin-top: 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        .upload-form input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h2>Upload Images for Pose Estimation</h2>
+
+    <div class="upload-section">
+        <div class="upload-form">
+            <label for="mainImage">Upload Image:</label>
+            <input type="file" name="mainImage" accept="image/*" required>
+        </div>
+
+        <div class="upload-form">
+            <label for="comparisonImage">Upload Comparison Image:</label>
+            <input type="file" name="comparisonImage" accept="image/*" required>
+        </div>
+    </div>
+
+    <form action="/process_images" method="post" enctype="multipart/form-data">
+        <!-- Submit Button -->
+        <div class="upload-form">
+            <input type="submit" value="Process Images">
+        </div>
+    </form>
+</body>
+</html>
