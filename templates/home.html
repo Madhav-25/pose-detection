@@ -45,29 +45,37 @@
         .upload-form input[type="submit"]:hover {
             background-color: #0056b3;
         }
+
+        .result-image {
+            display: none;
+            width: 400px;
+            height: auto;
+        }
     </style>
 </head>
 <body>
     <h2>Upload Images for Pose Estimation</h2>
 
-    <form action="/process_images" method="post" enctype="multipart/form-data">
-        <div class="upload-section">
-            <div class="upload-form">
-                <label for="mainImage">Upload Image:</label>
-                <input id="mainImage" type="file" name="mainImage" accept="image/*" required>
-            </div>
-    
-            <div class="upload-form">
-                <label for="comparisonImage">Upload Comparison Image:</label>
-                <input id="comparisonImage" type="file" name="comparisonImage" accept="image/*" required>
-            </div>
-        </div>
-        
-        <!-- Submit Button -->
+    <div class="upload-section">
         <div class="upload-form">
-            <input type="submit" value="Process Images" onclick="sendImagesToPython">
+            <label for="mainImage">Upload Image:</label>
+            <input id="mainImage" type="file" name="mainImage" accept="image/*" required>
+            <img id="mainImageDisplay" class="result-image" src="" alt="Main Image">
         </div>
-    </form>
+
+        <div class="upload-form">
+            <label for="comparisonImage">Upload Comparison Image:</label>
+            <input id="comparisonImage" type="file" name="comparisonImage" accept="image/*" required>
+            <img id="comparisonImageDisplay" class="result-image" src="" alt="Comparison Image">
+        </div>
+    </div>
+
+
+    <!-- Submit Button -->
+    <div class="upload-form">
+        <input type="submit" value="Process Images" onclick="sendImagesToPython()">
+        <h2 id="result-pose" class="result-image"></h2>
+    </div>
     <script>
         function sendImagesToPython() {
             // Assuming you have two file input elements in your HTML with ids 'mainImage' and 'comparisonImage'
@@ -97,11 +105,20 @@
             .then(data => {
                 // Handle the response from the Python function
                 console.log(data);
-                // You can update your frontend based on the result
+                const mainImageDisplay = document.getElementById('mainImageDisplay');
+                const comparisonImageDisplay = document.getElementById('comparisonImageDisplay'); 
+                const poseResult = document.getElementById('result-pose')               
+                mainImageDisplay.src = 'data:image/jpeg;base64,' + data.mainImage;
+                comparisonImageDisplay.src = 'data:image/jpeg;base64,' + data.comparisonImage;
+                poseResult.textContent = data.result
+                mainImageDisplay.style.display = "block";
+                comparisonImageDisplay.style.display = "block";
+                poseResult.style.display = "block"
             })
             .catch(error => {
                 console.error('Error:', error);
             });
+
         }
     </script>
 </body>
