@@ -4,6 +4,8 @@ import numpy as np
 import mediapipe as mp
 import cv2
 import PoseModule as pm
+import matplotlib.pyplot as plt
+import base64
 
 app = Flask(__name__)
 CORS(app)
@@ -48,6 +50,7 @@ def process_images():
         main_landmarks = detector.getPosition(main_image_rgb)
         comparison_image_rgb = detector.findPose(comparison_image_rgb)
         comparison_landmarks = detector.getPosition(comparison_image_rgb)
+
         threshold = 150
         # Compare pose landmarks
         if main_landmarks and comparison_landmarks:
@@ -58,8 +61,12 @@ def process_images():
                 result = "Pose is wrong"
         else:
             result = "Pose data not available"
+        main_image_rgb = draw_landmarks(main_image_rgb, main_landmarks)
+        comparison_image_rgb = draw_landmarks(comparison_image_rgb, comparison_landmarks)
 
-        return result
+        return jsonify({"result": result,
+                        "mainImage": image_to_base64(main_image_rgb),
+                        "comparisonImage": image_to_base64(comparison_image_rgb)})
     except Exception as e:
         return jsonify({'result': f'Error: {str(e)}'}), 400
 
@@ -72,6 +79,20 @@ def calculate_similarity(main_landmarks, comparison_landmarks):
     average_distance = np.mean(distances)
     print(average_distance)
     return average_distance
+
+
+def draw_landmarks(image, landmarks):
+    print(landmarks)
+    for landmark in landmarks:
+        x, y, z = landmark
+        cv2.circle(image, (x, y), 5, (0, 255, 0), -1)
+    return image
+
+
+def image_to_base64(image):
+    _, buffer = cv2.imencode(".jpg", image)
+    image_base64 = base64.b64encode(buffer).decode()
+    return image_base64
 
 
 if __name__ == '__main__':
