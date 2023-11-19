@@ -35,16 +35,11 @@ def pose_detection():
         return redirect(url_for('home', error="user not found, Please Sign up or verify your credentials"))
 
 
-@app.route('/login', methods=['POST'])
+@app.route('/logout', methods=['POST'])
 def login():
-    username = request.form['username']
-    password = request.form['password']
-    user = user_collection.find_one({'username': username, 'password': password})
-    if user:
-        session["username"] = username
-        session["password"] = password
-        return jsonify(user)
-    return jsonify({'error': 'User not found, Please Sign up'})
+    session["username"] = None
+    session["password"] = None
+    return jsonify({'message': 'Logout success'})
 
 
 @app.route('/signup')
@@ -81,7 +76,7 @@ def process_images():
         comparison_image_rgb = detector.findPose(comparison_image_rgb)
         comparison_landmarks = detector.getPosition(comparison_image_rgb)
 
-        threshold = 300
+        threshold = 250
         # Compare pose landmarks
         if main_landmarks and comparison_landmarks:
             similarity_score = calculate_similarity(main_landmarks, comparison_landmarks)
