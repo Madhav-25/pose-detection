@@ -16,12 +16,23 @@ CORS(app)
 
 @app.route('/')
 def home():
-    return render_template('login.html')
+    error = request.args.get("error")
+    return render_template('login.html', error=error)
 
 
-@app.route('/home')
-def home_page():
-    return render_template("home.html")
+@app.route('/pose_detection', methods=['POST'])
+def pose_detection():
+    username = request.form['username']
+    password = request.form['password']
+    user = user_collection.find_one({'username': username, 'password': password})
+    if user:
+        session["username"] = username
+        session["password"] = password
+        return render_template("home.html", username=session["username"],
+                                password=session["password"],
+                                display_picture=user["display_picture"])
+    else:
+        return redirect(url_for('home', error="user not found, Please Sign up or verify your credentials"))
 
 
 @app.route('/login', methods=['POST'])
@@ -29,12 +40,10 @@ def login():
     username = request.form['username']
     password = request.form['password']
     user = user_collection.find_one({'username': username, 'password': password})
-    print("123456")
-    print(user)
     if user:
         session["username"] = username
         session["password"] = password
-        return redirect(url_for('home'))
+        return jsonify(user)
     return jsonify({'error': 'User not found, Please Sign up'})
 
 

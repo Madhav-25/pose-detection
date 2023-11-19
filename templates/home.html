@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Pose Estimation</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -54,6 +55,22 @@
     </style>
 </head>
 <body>
+    <div class="container mt-4">
+        <!-- Header with user name, user image, and logout button -->
+        <div class="row mb-4">
+            <div class="col-6">
+                <!-- You can replace 'USERNAME' with the actual username -->
+                <h1>Welcome, {{ username }}</h1>
+            </div>
+            <div class="col-6 text-right">
+                <!-- Add user image source dynamically -->
+                <img src="data:image/jpeg;base64,{{ display_picture }}" alt="User Image" class="rounded-circle" style="width: 50px; height: 50px;">
+                <!-- Add logout button (you can replace '#logout' with the actual logout URL) -->
+                <a href="#logout" class="btn btn-danger ml-2">Logout</a>
+            </div>
+        </div>
+    </div>
+
     <h2>Upload Images for Pose Estimation</h2>
 
     <div class="upload-section">
