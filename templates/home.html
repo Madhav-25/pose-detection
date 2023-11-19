@@ -19,7 +19,9 @@
                 <h1>Welcome, {{ username }}</h1>
             </div>
             <div class="col-6 text-right">
-                <img src="data:image/jpeg;base64,{{ display_picture }}" alt="User Image" class="rounded-circle" style="width: 50px; height: 50px;">
+                {% if profile_picture %}
+                    <img src="data:image/jpeg;base64,{{ profile_picture }}" alt="User Image" class="rounded-circle" style="width: 50px; height: 50px;">
+                {% endif %}
                 <a href="#" class="btn btn-danger ml-2" onclick="logout()">Logout</a>
             </div>
         </div>
@@ -50,13 +52,8 @@
                 <div class="col-12 text-center">
                     <div class="upload-form">
                         <input type="submit" class="btn btn-primary" value="Process Images" onclick="sendImagesToPython()">
+                        <h2 id="result-pose" class="text-center mt-4"></h2>
                     </div>
-                </div>
-            </div>
-            <!-- Result Pose Section -->
-            <div class="row mt-4">
-                <div class="col-12 text-center">
-                    <h2 id="result-pose" class="result-image"></h2>
                 </div>
             </div>
         </div>
@@ -114,7 +111,15 @@
                 const poseResult = document.getElementById('result-pose')               
                 mainImageDisplay.src = 'data:image/jpeg;base64,' + data.mainImage;
                 comparisonImageDisplay.src = 'data:image/jpeg;base64,' + data.comparisonImage;
-                poseResult.textContent = data.result
+                if (data.similarity_score > 75) {
+                    poseResult.classList.add("btn-success")
+                    poseResult.classList.remove("btn-danger")
+                }
+                else {
+                    poseResult.classList.add("btn-danger")
+                    poseResult.classList.remove("btn-success")
+                }
+                poseResult.textContent = String(data.similarity_score) + "% similar"
                 mainImageDisplay.style.display = "block";
                 comparisonImageDisplay.style.display = "block";
                 poseResult.style.display = "block"

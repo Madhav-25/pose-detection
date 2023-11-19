@@ -30,7 +30,7 @@ def pose_detection():
         session["password"] = password
         return render_template("home.html", username=session["username"],
                                 password=session["password"],
-                                display_picture=user["display_picture"])
+                                profile_picture=user["profile_picture"])
     else:
         return redirect(url_for('home', error="user not found, Please Sign up or verify your credentials"))
 
@@ -64,10 +64,8 @@ def process_images():
         # Read and process the uploaded images
         main_image_data = main_image.read()
         comparison_image_data = comparison_image.read()
-
         main_image_np = np.frombuffer(main_image_data, np.uint8)
         comparison_image_np = np.frombuffer(comparison_image_data, np.uint8)
-
         main_image_rgb = cv2.imdecode(main_image_np, cv2.IMREAD_COLOR)
         comparison_image_rgb = cv2.imdecode(comparison_image_np, cv2.IMREAD_COLOR)
         detector = pm.PoseDetector()
@@ -76,20 +74,19 @@ def process_images():
         comparison_image_rgb = detector.findPose(comparison_image_rgb)
         comparison_landmarks = detector.getPosition(comparison_image_rgb)
 
-        threshold = 250
-        # Compare pose landmarks
-        if main_landmarks and comparison_landmarks:
-            similarity_score = calculate_similarity(main_landmarks, comparison_landmarks)
-            if similarity_score < threshold:
-                result = "Pose is correct"
-            else:
-                result = "Pose is wrong"
-        else:
-            result = "Pose data not available"
+        similarity_score = calculate_similarity(main_landmarks, comparison_landmarks)
         main_image_rgb = draw_landmarks(main_image_rgb, main_landmarks)
         comparison_image_rgb = draw_landmarks(comparison_image_rgb, comparison_landmarks)
-
-        return jsonify({"result": result,
+        pose_assessment_data = {
+            "assessment_id": str(uuid.uuid1()),
+            "timestamp": datetime.now(),
+            "uploaded_image": base64.b64encode(main_image_data).decode('utf-8'),
+            "estimated_pose_data": main_landmarks,
+            "correct_pose_definition": comparison_landmarks,
+            "similarity_score": similarity_score,
+        }
+        exercise_pose_collection.insert_one(pose_assessment_data).inserted_id
+        return jsonify({"similarity_score": similarity_score,
                         "mainImage": image_to_base64(main_image_rgb),
                         "comparisonImage": image_to_base64(comparison_image_rgb)})
     except Exception as e:
@@ -102,8 +99,8 @@ def calculate_similarity(main_landmarks, comparison_landmarks):
     distances = np.linalg.norm(main_points[:, 1:] - comparison_points[:, 1:], axis=1)
     # Calculate the average distance
     average_distance = np.mean(distances)
-    print(average_distance)
-    return average_distance
+    similarity_score = round((1 - (average_distance/1024)) * 100, 2)
+    return similarity_score
 
 
 def draw_landmarks(image, landmarks):
@@ -151,7 +148,7 @@ def save_user_data():
         "password": password,  # Note: In a production environment, hash the password before storing it
         "email": email,
         "registration_date": datetime.now(),
-        "display_picture": display_picture_base64
+        "profile_picture": display_picture_base64
     }
     user_id = user_collection.insert_one(user_data).inserted_id
 
