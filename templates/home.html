@@ -13,7 +13,6 @@
 </head>
 <body class="bg-light">
     <div class="container mt-4">
-        <!-- Header with user name, user image, and logout button -->
         <div class="row mb-4">
             <div class="col-6">
                 <h1>Welcome, {{ username }}</h1>
@@ -51,7 +50,7 @@
             <div class="row mt-4">
                 <div class="col-12 text-center">
                     <div class="upload-form">
-                        <input type="submit" class="btn btn-primary" value="Process Images" onclick="sendImagesToPython()">
+                        <input type="submit" class="btn btn-primary" value="Process Images" onclick="processImages()">
                         <h2 id="result-pose" class="text-center mt-4"></h2>
                     </div>
                 </div>
@@ -63,14 +62,13 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
 
+        // Function to logout the user and clear the session variables
         function logout() {
-            // Assuming you have a logout endpoint on the server
             fetch('/logout', {
                 method: 'POST'
             })
             .then(response => response.json())
             .then(data => {
-                // Clear session variables
                 window.location.href = "/";
             })
             .catch(error => {
@@ -78,8 +76,8 @@
             });
         }
 
-        function sendImagesToPython() {
-            // Assuming you have two file input elements in your HTML with ids 'mainImage' and 'comparisonImage'
+        // Function to process Images and return the pose estimations and similarity score
+        function processImages() {
             const mainImageInput = document.getElementById('mainImage');
             const comparisonImageInput = document.getElementById('comparisonImage');
 
@@ -97,15 +95,12 @@
             formData.append('mainImage', mainImageFile);
             formData.append('comparisonImage', comparisonImageFile);
             console.log(formData)
-            // Send the FormData to your Python server
             fetch('/process_images', {
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.json()) // Assuming the Python function returns JSON
+            .then(response => response.json()) 
             .then(data => {
-                // Handle the response from the Python function
-                console.log(data);
                 const mainImageDisplay = document.getElementById('mainImageDisplay');
                 const comparisonImageDisplay = document.getElementById('comparisonImageDisplay'); 
                 const poseResult = document.getElementById('result-pose')               

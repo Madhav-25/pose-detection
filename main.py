@@ -4,7 +4,6 @@ import numpy as np
 import mediapipe as mp
 import cv2
 import PoseModule as pm
-import matplotlib.pyplot as plt
 import base64
 from pymongo import MongoClient
 from datetime import datetime
@@ -16,12 +15,18 @@ CORS(app)
 
 @app.route('/')
 def home():
+    """
+    Render the login page
+    """
     error = request.args.get("error")
     return render_template('login.html', error=error)
 
 
 @app.route('/pose_detection', methods=['POST'])
 def pose_detection():
+    """
+    Render the home page after user login
+    """
     username = request.form['username']
     password = request.form['password']
     user = user_collection.find_one({'username': username, 'password': password})
@@ -36,7 +41,10 @@ def pose_detection():
 
 
 @app.route('/logout', methods=['POST'])
-def login():
+def logout():
+    """
+    Clear the session variables and user logout
+    """
     session["username"] = None
     session["password"] = None
     return jsonify({'message': 'Logout success'})
@@ -44,10 +52,17 @@ def login():
 
 @app.route('/signup')
 def signup():
+    """
+    Render the signup template
+    """
     return render_template('signup.html')
+
 
 @app.route('/process_images', methods=['POST'])
 def process_images():
+    """
+    Process both the images and return images with pose estimations
+    """
     try:
         print(request)
         # Initialize MediaPipe Pose
@@ -92,7 +107,11 @@ def process_images():
     except Exception as e:
         return jsonify({'result': f'Error: {str(e)}'}), 400
 
+
 def calculate_similarity(main_landmarks, comparison_landmarks):
+    """
+    Calculate the similarity score
+    """
     main_points = np.array(main_landmarks)
     comparison_points = np.array(comparison_landmarks)
     # Calculate the Euclidean distances
@@ -116,32 +135,29 @@ def image_to_base64(image):
     image_base64 = base64.b64encode(buffer).decode()
     return image_base64
 
+
 @app.route('/save_user_data', methods=['POST'])
 def save_user_data():
+    """
+    Save user data
+    """
     data = request.form
-
     # Validate the incoming data
     required_fields = ['username', 'password', 'email']
     for field in required_fields:
         if field not in data:
             return jsonify({"error": f"Missing {field} in the request"}), 400
-
     username = data['username']
     password = data['password']
     email = data['email']
-
-    # Save user data to MongoDB
     display_picture = request.files.get('displayImage')
     display_picture_base64 = None
-
      # Check if a user with the same username already exists
     existing_user = user_collection.find_one({"username": username})
     if existing_user:
         return jsonify({"error": f"User with username '{username}' already exists"}), 400
-
     if display_picture:
         display_picture_base64 = base64.b64encode(display_picture.read()).decode('utf-8')
-
     user_data = {
         "user_id": str(uuid.uuid1()),
         "username": username,
@@ -151,7 +167,6 @@ def save_user_data():
         "profile_picture": display_picture_base64
     }
     user_id = user_collection.insert_one(user_data).inserted_id
-
     return jsonify({"message": f"User with ID {user_id} registered successfully"}), 200
 
 
@@ -160,7 +175,6 @@ if __name__ == '__main__':
     db = client["pose-detection"]
     # Create User collection
     user_collection = db["User"]
-
     # Create ExercisePoseAssessment collection
     exercise_pose_collection = db["ExercisePoseAssessment"]
     app.run()

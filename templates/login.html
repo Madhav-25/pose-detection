@@ -42,10 +42,12 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
+        // Function to redirect the user to SignUp page
         function signup() {
             window.location.href = "/signup"
         }
 
+        // Function to validate the login and redirect the user to the home page
         function loginForm() {
             var username = document.getElementById("username").value;
             var password = document.getElementById("password").value;

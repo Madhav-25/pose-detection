@@ -55,12 +55,15 @@
 
 
 <script>
+
+    // Function to display the error messages of Form validations
     function displayErrorMessage(message) {
         const errorMessageDiv = document.getElementById("errorMessage");
         errorMessageDiv.textContent = message;
         errorMessageDiv.classList.remove("d-none"); // Remove 'd-none' class to make it visible
     }
 
+    // Function to validate the SignUp form and save user data for Login
     function validateForm() {
         var username = document.getElementById("username").value;
         var password = document.getElementById("password").value;
