@@ -8,6 +8,7 @@ import base64
 from pymongo import MongoClient
 from datetime import datetime
 import uuid
+import project
 
 app = Flask(__name__)
 app.secret_key = "pose-detection"
@@ -120,6 +121,12 @@ def calculate_similarity(main_landmarks, comparison_landmarks):
     average_distance = np.mean(distances)
     similarity_score = round((1 - (average_distance/1024)) * 100, 2)
     return similarity_score
+
+
+@app.route('/webcam_access', methods=['POST'])
+def webcam_access():
+    project.process_webcam()
+    return "Test"
 
 
 def draw_landmarks(image, landmarks):

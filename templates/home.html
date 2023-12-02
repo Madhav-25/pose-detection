@@ -24,36 +24,51 @@
                 <a href="#" class="btn btn-danger ml-2" onclick="logout()">Logout</a>
             </div>
         </div>
+        <div class="row">
+            <div class="col-1">
+                <button class="btn btn-primary" onclick="showManual()">Manual</button>
+            </div>
+            <div class="col-1">
+                <button class="btn btn-primary" onclick="showAutomation()">Automation</button>
+            </div>
+        </div>
         <hr class="my-4">
     </div>
     <div class="container mt-4">
-        <h2 class="text-center">Upload Images for Pose Estimation</h2>
-        <div class="upload-section mt-4">
-            <!-- Main Image Section -->
-            <div class="row">
-                <div class="col-md-6 text-right">
-                    <div class="upload-form">
-                        <label for="mainImage"><b>Upload Main Image:</b></label>
-                        <input id="mainImage" type="file" name="mainImage" accept="image/*" required>
-                        <img id="mainImageDisplay" class="result-image mt-2" src="" alt="Main Image">
+        <div id="automationSection" style="display: none;">
+            <h2 class="text-center">Upload Images for Pose Estimation</h2>
+            <div class="upload-section mt-4">
+                <!-- Main Image Section -->
+                <div class="row">
+                    <div class="col-md-6 text-right">
+                        <div class="upload-form">
+                            <label for="mainImage"><b>Upload Main Image:</b></label>
+                            <input id="mainImage" type="file" name="mainImage" accept="image/*" required>
+                            <img id="mainImageDisplay" class="result-image mt-2" src="" alt="Main Image">
+                        </div>
+                    </div>
+                    <!-- Comparison Image Section -->
+                    <div class="col-md-6 text-right">
+                        <div class="upload-form">
+                            <label for="comparisonImage"><b>Comparison Image:</b></label>
+                            <input id="comparisonImage" type="file" name="comparisonImage" accept="image/*" required>
+                            <img id="comparisonImageDisplay" class="result-image mt-2" src="" alt="Comparison Image">
+                        </div>
                     </div>
                 </div>
-                <!-- Comparison Image Section -->
-                <div class="col-md-6 text-right">
-                    <div class="upload-form">
-                        <label for="comparisonImage"><b>Comparison Image:</b></label>
-                        <input id="comparisonImage" type="file" name="comparisonImage" accept="image/*" required>
-                        <img id="comparisonImageDisplay" class="result-image mt-2" src="" alt="Comparison Image">
+                <div class="row mt-4">
+                    <div class="col-12 text-center">
+                        <div class="upload-form">
+                            <input type="submit" class="btn btn-primary" value="Process Images" onclick="processImages()">
+                            <h2 id="result-pose" class="text-center mt-4"></h2>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="row mt-4">
-                <div class="col-12 text-center">
-                    <div class="upload-form">
-                        <input type="submit" class="btn btn-primary" value="Process Images" onclick="processImages()">
-                        <h2 id="result-pose" class="text-center mt-4"></h2>
-                    </div>
-                </div>
+        </div>
+        <div id="manualSection" style="display: none;">
+            <div class="col-12 text-center">
+                <input type="submit" class="btn btn-primary" value="Webcam access" onclick="webcamAccess()">
             </div>
         </div>
     </div>
@@ -76,6 +91,18 @@
             });
         }
 
+        // Function to show manual pose estimation
+        function showManual() {
+            document.getElementById("manualSection").style.display = "block";
+            document.getElementById("automationSection").style.display = "none";
+        }
+
+        // Function to show automated pose estimation
+        function showAutomation() {
+            document.getElementById("manualSection").style.display = "none";
+            document.getElementById("automationSection").style.display = "block";
+        }
+        
         // Function to process Images and return the pose estimations and similarity score
         function processImages() {
             const mainImageInput = document.getElementById('mainImage');
@@ -123,6 +150,17 @@
                 console.error('Error:', error);
             });
 
+        }
+
+        function webcamAccess() {
+            fetch('/webcam_access', {
+                method: 'POST',
+                body: {}
+            })
+            .then(response => response.json())
+            .catch(error => {
+                console.error('Error:', error);
+            });
         }
     </script>
 </body>
