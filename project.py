@@ -146,7 +146,7 @@ def process_webcam():
             cv2.putText(image, f"Leg Raise Status: {leg_raise_stage}", (30, 140), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
             cv2.putText(image, f"Sit-up Status: {sit_up_stage}", (30, 180), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
             cv2.putText(image, f"Tadasana Status: {tadasana_stage}", (30, 220), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
-            cv2.putText(image, f"Glute Bridge Status: {bridge_stage}", (30, 260), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2, cv2.LINE_AA)
+            # cv2.putText(image, f"Glute Bridge Status: {bridge_stage}", (30, 260), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2, cv2.LINE_AA)
             cv2.putText(image, f"Knee Push-up Status: {kneepush_up_stage}", (30, 300), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
 
             cv2.imshow('Pose Detection', image)

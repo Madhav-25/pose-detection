@@ -3,6 +3,9 @@
 <head>
     <title>Pose Estimation</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <style>
         .result-image {
             display: none;
@@ -68,13 +71,21 @@
         </div>
         <div id="manualSection" style="display: none;">
             <div class="col-12 text-center">
+                <label for="exerciseSelect" class="form-label">Select Exercise</label>
+                <select class="form-select" id="exerciseSelect" aria-label="Default select example">
+                    <option selected value=""></option>
+                    <option value="squat">Squat</option>
+                    <option value="leg_raise">Leg-Raise</option>
+                    <option value="push_up">Push-up</option>
+                    <option value="sit_up">Sit-up</option>
+                    <option value="tadasana">Tadasana</option>
+                    <option value="glute_bridge">Glute Bridge</option>
+                    <option value="knee_push_up">Knee Push-up</option>
+                </select>
                 <input type="submit" class="btn btn-primary" value="Webcam access" onclick="webcamAccess()">
             </div>
         </div>
     </div>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
 
         // Function to logout the user and clear the session variables
@@ -153,14 +164,20 @@
         }
 
         function webcamAccess() {
-            fetch('/webcam_access', {
-                method: 'POST',
-                body: {}
-            })
-            .then(response => response.json())
-            .catch(error => {
-                console.error('Error:', error);
-            });
+            let exerciseSelect = document.getElementById("exerciseSelect").value
+            const formData = new FormData();
+
+            if((exerciseSelect !== "") && (exerciseSelect !== undefined)) {
+                formData.append('exerciseSelect', exerciseSelect);
+                fetch('/webcam_access', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
         }
     </script>
 </body>

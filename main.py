@@ -125,6 +125,7 @@ def calculate_similarity(main_landmarks, comparison_landmarks):
 
 @app.route('/webcam_access', methods=['POST'])
 def webcam_access():
+    exercise = request.form['exerciseSelect']
     project.process_webcam()
     return "Test"
 
