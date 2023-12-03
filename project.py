@@ -143,7 +143,7 @@ def process_webcam(exercise):
             "exercise_count": exercise_count,
             "exercise": exercise,
             "duration": f"{hours:02}:{minutes:02}:{seconds:02}",
-            "start_time": start_time.strftime("%H:%M:%S")
+            "start_time": start_time.strftime("%Y-%m-%d %H:%M:%S")
         }
 
 

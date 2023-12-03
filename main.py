@@ -9,6 +9,7 @@ from pymongo import MongoClient
 from datetime import datetime
 import uuid
 import project
+import json
 
 app = Flask(__name__)
 app.secret_key = "pose-detection"
@@ -131,9 +132,16 @@ def webcam_access():
     res = project.process_webcam(exercise)
     res["user_id"] = session["user_id"]
     exercise_id = exercise_count_collection.insert_one(res).inserted_id
-    print(exercise_id)
-    return ""
-    
+    return json.dumps({"exercise_id": str(exercise_id)}), 200
+
+
+@app.route('/exercise_count_data', methods=['GET'])
+def exercise_count_data():
+    projection = {'exercise_count': 1, 'exercise': 1, 'duration': 1, 'start_time': 1, 'user_id': 1, '_id': 0}
+    exercise_data_cursor = exercise_count_collection.find({"user_id": session["user_id"]}, projection)
+    exercise_data_list = list(exercise_data_cursor)
+    exercise_data_cursor.close()
+    return json.dumps(exercise_data_list), 200
 
 
 def draw_landmarks(image, landmarks):

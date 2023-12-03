@@ -2,10 +2,12 @@
 <html>
 <head>
     <title>Pose Estimation</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
     <style>
         .result-image {
             display: none;
@@ -88,10 +90,25 @@
                     <input type="submit" class="btn btn-primary" value="Webcam access" onclick="webcamAccess()">
                 </div>
             </div>
+            <div class="row mt-4" id="resultsTable">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Exercise</th>
+                            <th scope="col">Exercise count</th>
+                            <th scope="col">Duration</th>
+                            <th scope="col">Time</th>
+                            <!-- Add more headers if needed -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Table rows will be dynamically updated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
     <script>
-
         // Function to logout the user and clear the session variables
         function logout() {
             fetch('/logout', {
@@ -110,6 +127,7 @@
         function showManual() {
             document.getElementById("manualSection").style.display = "block";
             document.getElementById("automationSection").style.display = "none";
+            updateResultsTable()
         }
 
         // Function to show automated pose estimation
@@ -178,10 +196,39 @@
                     body: formData
                 })
                 .then(response => response.json())
+                .then(data => {
+                    updateResultsTable()
+                })
                 .catch(error => {
                     console.error('Error:', error);
                 });
             }
+        }
+
+        function updateResultsTable() {
+            fetch('/exercise_count_data', {
+                method: 'GET'
+            })
+            .then(response => response.json())
+            .then(data => {
+                var tableBody = document.querySelector('#resultsTable tbody');
+                tableBody.innerHTML = '';
+                data.forEach(item => {
+                    var newRow = tableBody.insertRow();
+                    var cell1 = newRow.insertCell(0);
+                    var cell2 = newRow.insertCell(1);
+                    var cell3 = newRow.insertCell(2);
+                    var cell4 = newRow.insertCell(3);
+
+                    // Fill the cells with data values
+                    cell1.textContent = item.exercise;
+                    cell2.textContent = item.exercise_count;
+                    cell3.textContent = item.duration;
+                    cell4.textContent = item.start_time; 
+                });
+                $('#resultsTable table').DataTable();
+                document.getElementById('resultsTable').style.display = 'block';
+            })
         }
     </script>
 </body>
