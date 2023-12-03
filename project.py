@@ -2,6 +2,7 @@
 import cv2
 import mediapipe as mp
 import numpy as np
+from datetime import datetime
 
 mp_drawing = mp.solutions.drawing_utils
 mp_pose = mp.solutions.pose
@@ -57,7 +58,7 @@ def is_kneepush_up(shoulder, elbow, hip, knee,ankle):
 
 # ...
 
-def process_webcam():
+def process_webcam(exercise):
     cap = cv2.VideoCapture(0)
 
     with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
@@ -66,8 +67,13 @@ def process_webcam():
         leg_raise_stage = None
         sit_up_stage = None
         tadasana_stage = None
-
+        exercise_count = 0
+        start_time = datetime.now()
+        end_time = None
+        frame_counter = 0
+        frames_to_process = 30
         while cap.isOpened():
+            
             ret, frame = cap.read()
 
             image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -102,61 +108,43 @@ def process_webcam():
                     end_point = (int(landmarks[connection[1].value].x * frame.shape[1]), int(landmarks[connection[1].value].y * frame.shape[0]))
                     cv2.line(image, start_point, end_point, (0, 255, 0), 2)
 
-                if is_squat(hip, knee, ankle):
-                    squat_stage = "Squatting"
-                else:
-                    squat_stage = "Idle"
-
-                if is_push_up(shoulder, elbow, hip, knee):
-                    push_up_stage = "Push-up"
-                else:
-                    push_up_stage = "Idle"
-
-                if is_leg_raise(hip, knee, ankle,shoulder):
-                    leg_raise_stage = "Leg Raise"
-                else:
-                    leg_raise_stage = "Idle"
-
-                if is_sit_up(shoulder, hip, knee):
-                    sit_up_stage = "Sit-up"
-                else:
-                    sit_up_stage = "Idle"
-
-                if is_tadasana(shoulder, hip, knee, ankle,wrist):
-                    tadasana_stage = "Tadasana"
-                else:
-                    tadasana_stage = "Idle"
-
-                if is_bridge(shoulder, hip, knee, ankle):
-                    bridge_stage = "Glute Bridge"
-                else:
-                    bridge_stage = "Idle"
-
-                if is_kneepush_up(shoulder, elbow, hip, knee,ankle):
-                    kneepush_up_stage = "Knee Push-up"
-                else:
-                    kneepush_up_stage = "Idle"
-
-
+                exercise_map = {
+                    "squat": is_squat(hip, knee, ankle),
+                    "leg_raise": is_leg_raise(hip, knee, ankle,shoulder),
+                    "push_up": is_push_up(shoulder, elbow, hip, knee),
+                    "sit_up": is_sit_up(shoulder, hip, knee),
+                    "tadasana": is_tadasana(shoulder, hip, knee, ankle,wrist),
+                    "glute_bridge": is_bridge(shoulder, hip, knee, ankle),
+                    "knee_push_up": is_kneepush_up(shoulder, elbow, hip, knee,ankle)
+                }
+                if frame_counter == frames_to_process:
+                    stage = exercise_map[exercise]
+                    if stage:
+                        exercise_count += 1
+                    frame_counter = 0
             except:
                 pass
 
-            cv2.putText(image, f"Squat Status: {squat_stage}", (30, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2, cv2.LINE_AA)
-            cv2.putText(image, f"Push-up Status: {push_up_stage}", (30, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2, cv2.LINE_AA)
-            cv2.putText(image, f"Leg Raise Status: {leg_raise_stage}", (30, 140), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
-            cv2.putText(image, f"Sit-up Status: {sit_up_stage}", (30, 180), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
-            cv2.putText(image, f"Tadasana Status: {tadasana_stage}", (30, 220), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
-            # cv2.putText(image, f"Glute Bridge Status: {bridge_stage}", (30, 260), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2, cv2.LINE_AA)
-            cv2.putText(image, f"Knee Push-up Status: {kneepush_up_stage}", (30, 300), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
-
+            cv2.putText(image, f"{exercise} count: {exercise_count}", (30, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2, cv2.LINE_AA)
             cv2.imshow('Pose Detection', image)
 
             key = cv2.waitKey(1) & 0xFF
-            if key == 27 or key == ord('q'):             
+            if key == 27 or key == ord('q'): 
+                end_time = datetime.now()       
                 break
+            frame_counter += 1
 
+        time_difference = end_time - start_time
+        hours, remainder = divmod(time_difference.seconds, 3600)
+        minutes, seconds = divmod(remainder, 60)
         cap.release()
         cv2.destroyAllWindows()
+        return {
+            "exercise_count": exercise_count,
+            "exercise": exercise,
+            "duration": f"{hours:02}:{minutes:02}:{seconds:02}",
+            "start_time": start_time.strftime("%H:%M:%S")
+        }
 
 
 if __name__ == "__main__":

@@ -34,6 +34,7 @@ def pose_detection():
     if user:
         session["username"] = username
         session["password"] = password
+        session["user_id"] = user["user_id"]
         return render_template("home.html", username=session["username"],
                                 password=session["password"],
                                 profile_picture=user["profile_picture"])
@@ -48,6 +49,7 @@ def logout():
     """
     session["username"] = None
     session["password"] = None
+    session["user_id"] = None
     return jsonify({'message': 'Logout success'})
 
 
@@ -126,8 +128,12 @@ def calculate_similarity(main_landmarks, comparison_landmarks):
 @app.route('/webcam_access', methods=['POST'])
 def webcam_access():
     exercise = request.form['exerciseSelect']
-    project.process_webcam()
-    return "Test"
+    res = project.process_webcam(exercise)
+    res["user_id"] = session["user_id"]
+    exercise_id = exercise_count_collection.insert_one(res).inserted_id
+    print(exercise_id)
+    return ""
+    
 
 
 def draw_landmarks(image, landmarks):
@@ -185,4 +191,5 @@ if __name__ == '__main__':
     user_collection = db["User"]
     # Create ExercisePoseAssessment collection
     exercise_pose_collection = db["ExercisePoseAssessment"]
+    exercise_count_collection = db["ExerciseCountAssessment"]
     app.run()

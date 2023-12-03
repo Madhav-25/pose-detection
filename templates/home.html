@@ -70,19 +70,23 @@
             </div>
         </div>
         <div id="manualSection" style="display: none;">
-            <div class="col-12 text-center">
-                <label for="exerciseSelect" class="form-label">Select Exercise</label>
-                <select class="form-select" id="exerciseSelect" aria-label="Default select example">
-                    <option selected value=""></option>
-                    <option value="squat">Squat</option>
-                    <option value="leg_raise">Leg-Raise</option>
-                    <option value="push_up">Push-up</option>
-                    <option value="sit_up">Sit-up</option>
-                    <option value="tadasana">Tadasana</option>
-                    <option value="glute_bridge">Glute Bridge</option>
-                    <option value="knee_push_up">Knee Push-up</option>
-                </select>
-                <input type="submit" class="btn btn-primary" value="Webcam access" onclick="webcamAccess()">
+            <div class="row col-12 text-center">
+                <div class="input-group col-4">
+                    <label for="exerciseSelect" class="form-label m-2">Select Exercise</label>
+                    <select class="form-select" id="exerciseSelect" aria-label="Default select example">
+                        <option selected value=""></option>
+                        <option value="squat">Squat</option>
+                        <option value="leg_raise">Leg-Raise</option>
+                        <option value="push_up">Push-up</option>
+                        <option value="sit_up">Sit-up</option>
+                        <option value="tadasana">Tadasana</option>
+                        <option value="glute_bridge">Glute Bridge</option>
+                        <option value="knee_push_up">Knee Push-up</option>
+                    </select>
+                </div>
+                <div class="input-group col-4">
+                    <input type="submit" class="btn btn-primary" value="Webcam access" onclick="webcamAccess()">
+                </div>
             </div>
         </div>
     </div>
