@@ -98,11 +98,13 @@ def process_images():
         comparison_image_rgb = draw_landmarks(comparison_image_rgb, comparison_landmarks)
         pose_assessment_data = {
             "assessment_id": str(uuid.uuid1()),
-            "timestamp": datetime.now(),
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "uploaded_image": base64.b64encode(main_image_data).decode('utf-8'),
+            "comparison_image": base64.b64encode(comparison_image_data).decode('utf-8'),
             "estimated_pose_data": main_landmarks,
             "correct_pose_definition": comparison_landmarks,
             "similarity_score": similarity_score,
+            "user_id": session["user_id"]
         }
         exercise_pose_collection.insert_one(pose_assessment_data).inserted_id
         return jsonify({"similarity_score": similarity_score,
@@ -142,6 +144,15 @@ def exercise_count_data():
     exercise_data_list = list(exercise_data_cursor)
     exercise_data_cursor.close()
     return json.dumps(exercise_data_list), 200
+
+
+@app.route('/exercise_assessment_data', methods=['GET'])
+def exercise_assessment_data():
+    projection = {'_id': 0, 'estimated_pose_data': 0, 'correct_pose_definition': 0}
+    pose_assessment_cursor = exercise_pose_collection.find({"user_id": session["user_id"]}, projection)
+    pose_assessment_list = list(pose_assessment_cursor)
+    pose_assessment_cursor.close()
+    return json.dumps(pose_assessment_list), 200
 
 
 def draw_landmarks(image, landmarks):

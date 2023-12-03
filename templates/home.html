@@ -70,6 +70,22 @@
                     </div>
                 </div>
             </div>
+            <div class="row mt-4" id="exerciseResultsTable">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Uploaded Image</th>
+                            <th scope="col">Comparison Image</th>
+                            <th scope="col">Similarity Score</th>
+                            <th scope="col">Date</th>
+                            <!-- Add more headers if needed -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Table rows will be dynamically updated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
         </div>
         <div id="manualSection" style="display: none;">
             <div class="row col-12 text-center">
@@ -134,6 +150,7 @@
         function showAutomation() {
             document.getElementById("manualSection").style.display = "none";
             document.getElementById("automationSection").style.display = "block";
+            updateExerciseAssessment()
         }
         
         // Function to process Images and return the pose estimations and similarity score
@@ -178,6 +195,7 @@
                 mainImageDisplay.style.display = "block";
                 comparisonImageDisplay.style.display = "block";
                 poseResult.style.display = "block"
+                updateExerciseAssessment()
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -228,6 +246,41 @@
                 });
                 $('#resultsTable table').DataTable();
                 document.getElementById('resultsTable').style.display = 'block';
+            })
+        }
+    
+        function updateExerciseAssessment() {
+            fetch('/exercise_assessment_data', {
+                method: 'GET'
+            })
+            .then(response => response.json())
+            .then(data => {
+                var tableBody = document.querySelector('#exerciseResultsTable tbody');
+                tableBody.innerHTML = '';
+                data.forEach(item => {
+                    var newRow = tableBody.insertRow();
+                    var cell1 = newRow.insertCell(0);
+                    var cell2 = newRow.insertCell(1);
+                    var cell3 = newRow.insertCell(2);
+                    var cell4 = newRow.insertCell(3);
+
+                    var uploadedImage = document.createElement("img");
+                    uploadedImage.src = "data:image/jpeg;base64," + item.uploaded_image;
+                    uploadedImage.alt = "Uploaded Image";
+                    uploadedImage.style.width = "100px";
+                    uploadedImage.style.height = "100px";
+                    cell1.appendChild(uploadedImage);
+                    var comparisonImage = document.createElement("img");
+                    comparisonImage.src = "data:image/jpeg;base64," + item.comparison_image;
+                    comparisonImage.alt = "Comparison Image";
+                    comparisonImage.style.width = "100px";
+                    comparisonImage.style.height = "100px";
+                    cell2.appendChild(comparisonImage);
+                    cell3.textContent = item.similarity_score;
+                    cell4.textContent = item.timestamp; 
+                });
+                $('#exerciseResultsTable table').DataTable();
+                document.getElementById('exerciseResultsTable').style.display = 'block';
             })
         }
     </script>
